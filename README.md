@@ -40,10 +40,33 @@ Diego Álvarez
 ##  Código
 
 ```python
- def esPrimo(numero):
-    """
-    Devuelve True si numero es primo, False en caso contrario.
-    """
+"""
+Nombre: Diego Álvarez
+
+>>> [numero for numero in range(2, 50) if esPrimo(numero)]
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
+
+>>> primos(50)
+(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47)
+
+>>> descompon(36 * 175 * 143)
+(2, 2, 3, 3, 5, 5, 7, 11, 13)
+
+>>> mcm(90, 14)
+630
+
+>>> mcd(924, 780)
+12
+
+>>> mcm(42, 60, 70, 63)
+1260
+
+>>> mcd(840, 630, 1050, 1470)
+210
+"""
+
+
+def esPrimo(numero):
     if not isinstance(numero, int) or numero <= 1:
         raise TypeError("El número debe ser natural mayor que 1")
 
@@ -53,85 +76,103 @@ Diego Álvarez
     if numero % 2 == 0:
         return False
 
-    for i in range(3, int(numero ** 0.5) + 1, 2):
-        if numero % i == 0:
+    divisor = 3
+    while divisor * divisor <= numero:
+        if numero % divisor == 0:
             return False
+        divisor += 2
 
     return True
 
 
 def primos(numero):
-    """
-    Devuelve una tupla con los números primos menores que numero.
-    """
-    return tuple(n for n in range(2, numero) if esPrimo(n))
+    if not isinstance(numero, int) or numero <= 1:
+        raise TypeError("El número debe ser natural mayor que 1")
+
+    resultado = []
+
+    for candidato in range(2, numero):
+        if esPrimo(candidato):
+            resultado.append(candidato)
+
+    return tuple(resultado)
 
 
 def descompon(numero):
-    """
-    Devuelve la descomposición en factores primos de numero.
-    """
+    if not isinstance(numero, int) or numero <= 1:
+        raise TypeError("El número debe ser natural mayor que 1")
+
     factores = []
     divisor = 2
+    n = numero
 
-    while numero > 1:
-        while numero % divisor == 0:
+    while n > 1:
+        while n % divisor == 0:
             factores.append(divisor)
-            numero //= divisor
+            n //= divisor
         divisor += 1
 
     return tuple(factores)
 
 
 def mcd(*numeros):
-    """
-    Devuelve el máximo común divisor de varios números.
-    """
-    from collections import Counter
+    if len(numeros) < 2:
+        raise TypeError("Debe introducir al menos dos números")
 
-    factorizaciones = [Counter(descompon(n)) for n in numeros]
+    for numero in numeros:
+        if not isinstance(numero, int) or numero <= 1:
+            raise TypeError("Todos los números deben ser naturales mayores que 1")
 
-    comun = factorizaciones[0]
+    descomposiciones = []
+    for numero in numeros:
+        descomposiciones.append(list(descompon(numero)))
 
-    for f in factorizaciones[1:]:
-        comun = {k: min(comun.get(k, 0), f.get(k, 0)) for k in comun}
+    comunes = descomposiciones[0][:]
+
+    for factores in descomposiciones[1:]:
+        nueva_comunes = []
+        factores_copia = factores[:]
+
+        for factor in comunes:
+            if factor in factores_copia:
+                nueva_comunes.append(factor)
+                factores_copia.remove(factor)
+
+        comunes = nueva_comunes
 
     resultado = 1
-    for primo, exp in comun.items():
-        resultado *= primo ** exp
+    for factor in comunes:
+        resultado *= factor
 
     return resultado
 
 
 def mcm(*numeros):
-    """
-    Devuelve el mínimo común múltiplo de varios números.
-    """
-    from collections import Counter
+    if len(numeros) < 2:
+        raise TypeError("Debe introducir al menos dos números")
 
-    factorizaciones = [Counter(descompon(n)) for n in numeros]
+    for numero in numeros:
+        if not isinstance(numero, int) or numero <= 1:
+            raise TypeError("Todos los números deben ser naturales mayores que 1")
 
-    union = {}
+    descomposiciones = []
+    for numero in numeros:
+        descomposiciones.append(list(descompon(numero)))
 
-    for f in factorizaciones:
-        for primo, exp in f.items():
-            union[primo] = max(union.get(primo, 0), exp)
+    union = []
+
+    for factores in descomposiciones:
+        factores_copia = factores[:]
+
+        for factor in union:
+            if factor in factores_copia:
+                factores_copia.remove(factor)
+
+        union.extend(factores_copia)
 
     resultado = 1
-    for primo, exp in union.items():
-        resultado *= primo ** exp
+    for factor in union:
+        resultado *= factor
 
     return resultado
-
-
-if __name__ == "__main__":
-    # Tests
-    print([n for n in range(2, 50) if esPrimo(n)])
-    print(primos(50))
-    print(descompon(36 * 175 * 143))
-    print(mcm(90, 14))
-    print(mcd(924, 780))
-    print(mcm(42, 60, 70, 63))
-    print(mcd(840, 630, 1050, 1470))
 ```
-
