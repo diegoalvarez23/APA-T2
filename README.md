@@ -24,7 +24,7 @@
 > [!Important]
 > Introduzca a continuación su nombre y apellidos:
 >
-> DIEGO ALVAREZ TOME
+> DIEGO ALVAREZ TOME 
 
 ## Fichero `primos.py`
 
